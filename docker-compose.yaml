@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  front:
+    build:
+      context: './client'
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    container_name: frontend
+    environment:
+      - WATCHPACK_POLLING=true
+    networks:
+      - mern-stack-network
+    volumes:
+      - ./client:/usr/src/app
+    depends_on:
+      - backends
+  backends:
+    build:
+      context: './backend'
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    container_name: express-container
+    networks: 
+      - mern-stack-network
+    volumes:
+      - ./backend:/usr/src/app
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+    container_name: mongo-container
+    networks:
+      - mern-stack-network
+    volumes:
+      - mongoData:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_DATABASE=cms
+      
+
+networks:
+  mern-stack-network:
+
+volumes:
+  mongoData:
